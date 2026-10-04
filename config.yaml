@@ -1,0 +1,88 @@
+# JobFinder configuration, tuned for a senior Python backend engineer who needs visa sponsorship in Europe.
+
+profile:
+  # 4 points each (max 25 for skills together).
+  primary_skills: [python, django, fastapi, kafka, kubernetes, microservices, postgresql, celery, rabbitmq, redis, docker]
+  # 1 point each.
+  secondary_skills: [django rest framework, drf, sqlalchemy, pydantic, clickhouse, mongodb, grafana, prometheus,
+                     ci/cd, linux, event-driven, rest api, pytest, asyncio, distributed systems, n8n, blockchain, crypto,
+                     fintech, payments]
+  # A job is kept only if its title contains one of these.
+  title_include: [backend, back-end, back end, python, django, fastapi, software engineer, software developer,
+                  platform engineer, api engineer, developer, engineer]
+  # ... and none of these.
+  title_exclude: [junior, intern, internship, working student, werkstudent, praktikant, trainee, graduate, frontend,
+                  front-end, ios, android, mobile, recruiter, sales, account executive, designer, marketing, support engineer,
+                  qa, test engineer, data scientist, hardware, embedded, firmware, mechanical, electrical, php, ".net", "c#",
+                  java developer, salesforce, sap]
+  seniority_bonus: [senior, sr, lead, staff]
+
+search:
+  keywords: [python, backend, django]
+  # Country weight between 0 and 1 (20 points × weight). Germany and the Netherlands have the most predictable
+  # routes for non-EU engineers (EU Blue Card / Highly Skilled Migrant), so they rank highest.
+  countries:
+    DE: 1.0
+    NL: 1.0
+    IE: 0.9
+    AT: 0.85
+    SE: 0.85
+    DK: 0.85
+    FI: 0.8
+    EE: 0.8
+    GB: 0.8
+    LU: 0.75
+    BE: 0.75
+    PT: 0.75
+    ES: 0.75
+    PL: 0.7
+    CZ: 0.7
+    LT: 0.7
+    CH: 0.7
+    FR: 0.65
+  other_europe_weight: 0.5
+  include_remote_europe: true
+  include_not_offered: false   # drop postings that say they do not sponsor
+  require_visa_signal: false   # true = only keep jobs with a sponsorship, relocation or known-sponsor signal
+  max_age_days: 45
+  min_score: 35
+
+sources:
+  arbeitnow:
+    enabled: true
+    pages: 5
+    only_visa: true     # Arbeitnow's own "visa sponsorship" filter
+  remotive:
+    enabled: true
+    category: software-dev
+  remoteok:
+    enabled: true
+  hackernews:
+    enabled: true
+    threads: 1          # latest monthly "Who is hiring?" thread
+  # Company career pages. Slugs are the part of the board URL after the host, e.g. boards.greenhouse.io/<slug>.
+  # Boards that do not exist (404) are skipped with a warning, so it is safe to add guesses.
+  greenhouse:
+    enabled: true
+    companies: [n26, sumup, hellofresh, getyourguide, contentful, celonis, babbel, taxfix, raisin, commercetools,
+                sennder, omio, traderepublicbank, monzo, intercom, stripe, cloudflare, mongodb, datadog, elastic,
+                grammarly, squarespace, anthropic, mollie, adyen, wolt, airbnb, gitlab, remotecom, bolt, pitch, blinkist]
+  lever:
+    enabled: true
+    companies: [spotify, mistral, palantir, qonto, veriff, pipedrive, wise]
+  ashby:
+    enabled: true
+    companies: [n8n, elevenlabs, supabase, posthog, deepl, pleo, synthesia, openai, langchain, parloa, helsing]
+  # LinkedIn / Indeed / Glassdoor via python-jobspy (pip install -e ".[linkedin]"). Off by default.
+  jobspy:
+    enabled: false
+    sites: [linkedin, indeed]
+    countries: [DE, NL, IE, SE]
+    search_terms: ["python backend visa sponsorship", "senior python developer relocation"]
+    results_per_search: 30
+    hours_old: 336
+    fetch_descriptions: true
+
+database: data/jobs.db
+sponsors_dir: data/sponsors
+output_dir: reports

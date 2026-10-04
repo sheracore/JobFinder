@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mohammad Ghaffary – Resume</title>
+<style>
+  @page { size: A4; margin: 13mm 14mm; }
+  :root { --ink:#1a1a1a; --muted:#555; --accent:#1f4e79; --rule:#c9d3de; }
+  * { box-sizing: border-box; }
+  body { font-family: "Helvetica Neue", Arial, "Liberation Sans", sans-serif; color: var(--ink);
+         font-size: 10pt; line-height: 1.38; margin: 0; background: #fff; }
+  .page { max-width: 190mm; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 6px; }
+  h1 { font-size: 21pt; margin: 0; letter-spacing: .5px; }
+  .headline { font-size: 11pt; color: var(--accent); font-weight: 600; margin: 2px 0 4px; }
+  .contact { font-size: 9.2pt; color: var(--muted); }
+  .contact a { color: var(--muted); text-decoration: none; }
+  h2 { font-size: 10.5pt; text-transform: uppercase; letter-spacing: 1.2px; color: var(--accent);
+       border-bottom: 1.2px solid var(--rule); padding-bottom: 2px; margin: 11px 0 5px; }
+  p { margin: 0 0 4px; }
+  .job { margin-bottom: 8px; }
+  li, .job-head, .context { break-inside: avoid; }
+  .job-head { break-after: avoid; }
+  .job-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .role { font-weight: 700; }
+  .org { font-weight: 600; }
+  .when { color: var(--muted); font-size: 9.2pt; white-space: nowrap; }
+  .context { color: var(--muted); font-style: italic; font-size: 9.3pt; margin: 1px 0 2px; }
+  ul { margin: 2px 0 2px 16px; padding: 0; }
+  li { margin: 0 0 2.5px; }
+  .tech { font-size: 9pt; color: var(--muted); margin-top: 2px; }
+  .tech b { color: var(--ink); font-weight: 600; }
+  table.skills { border-collapse: collapse; width: 100%; }
+  table.skills td { padding: 1.5px 0; vertical-align: top; }
+  table.skills td:first-child { width: 33mm; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <h1>Mohammad Ghaffary</h1>
+  <div class="headline">Senior Backend Engineer &middot; Python &middot; Distributed Systems</div>
+  <div class="contact">
+    Tehran, Iran &middot; Open to relocation to Europe (EU Blue Card / work visa) &middot;
+    <a href="mailto:m.ghaffari662@gmail.com">m.ghaffari662@gmail.com</a> &middot;
+    <a href="https://www.linkedin.com/in/sheracore/">linkedin.com/in/sheracore</a> &middot;
+    <a href="https://github.com/sheracore">github.com/sheracore</a>
+  </div>
+</header>
+
+<h2>Summary</h2>
+<p>
+Senior Backend Engineer with 8 years of experience designing, scaling and modernizing Python systems. Most recently at
+<b>Nobitex, Iran's largest cryptocurrency exchange (10M+ users)</b>, where I re-architected coin and blockchain-network
+integration and led the safe migration of money-handling code off a legacy stack. Hands-on with <b>Django/DRF, FastAPI,
+event-driven microservices with Kafka and RabbitMQ, PostgreSQL performance tuning, Docker and Kubernetes</b>. I like
+turning slow, risky manual processes into automated, well-tested ones, and I mentor other engineers along the way.
+</p>
+
+<h2>Skills</h2>
+<table class="skills">
+  <tr><td>Languages</td><td>Python (expert), SQL, Bash; familiar with TypeScript</td></tr>
+  <tr><td>Backend</td><td>Django, Django REST Framework, FastAPI, Celery, SQLAlchemy 2.x, Pydantic v2, REST API design, OpenAPI/Swagger</td></tr>
+  <tr><td>Distributed systems</td><td>Microservices, Apache Kafka, RabbitMQ, event-driven architecture, idempotent producers/consumers, concurrency control</td></tr>
+  <tr><td>Data</td><td>PostgreSQL (query tuning, indexing, row-level locking), Redis, MongoDB, ClickHouse, Alembic, ETL pipelines</td></tr>
+  <tr><td>Cloud &amp; DevOps</td><td>Docker, Docker Compose, Kubernetes, CI/CD, Linux, Prometheus, Grafana</td></tr>
+  <tr><td>Practices</td><td>Testing with pytest (TDD), SOLID, design patterns, legacy modernization, code review, mentoring, Agile/Scrum</td></tr>
+  <tr><td>Automation &amp; AI</td><td>n8n (custom community nodes), LLM API integration, Telegram bots</td></tr>
+</table>
+
+<h2>Experience</h2>
+
+<div class="job">
+  <div class="job-head"><div><span class="role">Freelance Backend Engineer</span> &mdash; <span class="org">QueueLess</span> (Remote)</div><div class="when">2026 &ndash; Present</div></div>
+  <div class="context">Event-driven SaaS that replaces physical lines at clinics, barbers, restaurants and public offices with virtual tickets, live position tracking and notifications.</div>
+  <ul>
+    <li>Designed the target architecture as independent microservices (Identity, Queue, Business, Notification, Waiting-Time, Analytics) with a database per service, Kafka for domain events and synchronous HTTP for queries.</li>
+    <li>Built the core Queue Service with FastAPI, SQLAlchemy 2.x, Pydantic v2 and PostgreSQL. Ticket issuing and &ldquo;call next&rdquo; run under row-level locks (<code>SELECT &hellip; FOR UPDATE</code>), so concurrent requests never produce duplicate or skipped tickets.</li>
+    <li>Modeled the ticket lifecycle as a state machine enforced by atomic compare-and-set SQL updates and partial unique indexes: when two actions race on one ticket, exactly one wins and the other receives <code>409</code>.</li>
+    <li>Published domain events to Kafka (KRaft) with idempotent producers, <code>queue_id</code> partition keys for per-queue ordering, and a versioned event envelope that lets consumers deduplicate and evolve schemas.</li>
+    <li>Containerized the stack (health-gated startup, one-shot migration and topic-init jobs), ready for Kubernetes deployment with health probes and environment-based config, and covered race conditions and event publishing with pytest.</li>
+  </ul>
+  <div class="tech"><b>Tech:</b> Python, FastAPI, Kafka, PostgreSQL, SQLAlchemy, Alembic, Docker, Kubernetes, pytest &middot; github.com/sheracore/queueless</div>
+</div>
+
+<div class="job">
+  <div class="job-head"><div><span class="role">Senior Software Engineer</span> &mdash; <span class="org">Nobitex</span> (Tehran, Iran)</div><div class="when">Aug 2023 &ndash; May 2026</div></div>
+  <div class="context">Iran's largest cryptocurrency exchange: 10M+ users, high-volume trading, deposits and withdrawals across dozens of blockchains.</div>
+  <ul>
+    <li>Re-architected cryptocurrency coin and network integration to be configuration-driven, cutting the time to add a new coin or network from <b>~3 hours to ~5 minutes</b> with <b>no code deployment</b>, and untangled the system-wide dependencies that had made it hard-coded.</li>
+    <li>Built a compatibility layer that translated responses from the new Django REST Framework APIs into legacy formats, letting the team migrate endpoints incrementally with <b>zero breaking changes for clients</b>, plus centralized logging and error handling.</li>
+    <li>Designed a deposit-simulation harness that ran the same scenarios through legacy and refactored code and logged any diverging responses. This shadow testing of money-handling code made the refactoring <b>~20% faster</b> and caught regressions before release.</li>
+    <li>Mentored a mid-level engineer through the delivery of a Telegram bot that lets product owners list new blockchain tokens themselves, reducing engineering effort for token listings by <b>~90%</b>.</li>
+    <li>Profiled and tuned slow PostgreSQL queries and ORM access patterns on critical paths (indexes, query rewrites, eliminating N+1 queries), reducing database hits by <b>up to 50%</b>.</li>
+  </ul>
+  <div class="tech"><b>Tech:</b> Python, Django, DRF, Celery, RabbitMQ, PostgreSQL, Redis, Docker, Prometheus, Grafana</div>
+</div>
+
+<div class="job">
+  <div class="job-head"><div><span class="role">Backend Engineer (Django)</span> &mdash; <span class="org">Learnwise</span> (Remote)</div><div class="when">Jul 2022 &ndash; Aug 2023</div></div>
+  <div class="context">Misalearn, a language-learning application.</div>
+  <ul>
+    <li>Cut client requests for Oxford dictionary updates by <b>95%</b> by replacing per-word polling with periodically generated, encrypted JSON bundles built by Celery Beat.</li>
+    <li>Built a reusable Django module for metadata generation, validation and key control, adopted across the application by other modules.</li>
+    <li>Reached <b>100% API documentation coverage</b> by extending Swagger/OpenAPI schema generation to support custom field types and django-filter endpoints.</li>
+    <li>Developed and published an n8n community node, and integrated LLM-generated content into the product's learning flows.</li>
+  </ul>
+  <div class="tech"><b>Tech:</b> Python, Django, DRF, Celery, PostgreSQL, Redis, Swagger/OpenAPI, n8n</div>
+</div>
+
+<div class="job">
+  <div class="job-head"><div><span class="role">Backend Engineer &amp; Data Analyst</span> &mdash; <span class="org">Farafan</span> (Tehran, Iran)</div><div class="when">Jun 2018 &ndash; Jun 2022</div></div>
+  <div class="context">Telecommunications and IT solutions provider (300+ employees).</div>
+  <ul>
+    <li><b>VirusPaad (SaaS):</b> built the Django backend of a multi-engine file-scanning platform, available on the web and on kiosks, that checks files against 40+ antivirus engines. Orchestrated 40+ VMs through RPyC remote execution and ingested files over Samba and FTPS.</li>
+    <li><b>Radio Patrol (telecom analytics):</b> automated ~<b>80%</b> of manual reporting with ETL pipelines that extract large-scale mobile network data from ClickHouse, compute KPIs into PostgreSQL and visualize them in Grafana.</li>
+  </ul>
+  <div class="tech"><b>Tech:</b> Python, Django, RPyC, ClickHouse, PostgreSQL, Grafana, Linux</div>
+</div>
+
+<h2>Projects</h2>
+<p><b>JobFinder</b> &mdash; Visa-sponsorship job aggregator for Europe. Collects postings from job boards and company career APIs
+(Greenhouse, Lever, Ashby), detects sponsorship and relocation signals, cross-checks official sponsor registers and ranks
+roles against a skills profile. Python, httpx, SQLite, GitHub Actions &middot; github.com/sheracore/JobFinder</p>
+
+<h2>Education</h2>
+<div class="job-head"><div><span class="role">M.Sc. in Information Technology Engineering</span> &mdash; K. N. Toosi University of Technology, Tehran</div></div>
+
+<h2>Languages</h2>
+<p>English: professional working proficiency &middot; Persian: native</p>
+
+</div>
+</body>
+</html>

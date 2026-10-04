@@ -1,0 +1,40 @@
+name: Daily job search
+
+on:
+  schedule:
+    - cron: "17 6 * * *"   # every day at 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+
+      # Keep the history database between runs so "new" means new since yesterday.
+      - uses: actions/cache@v4
+        with:
+          path: data
+          key: jobfinder-data-${{ github.run_id }}
+          restore-keys: jobfinder-data-
+
+      - name: Refresh sponsor registers
+        run: jobfinder sponsors || echo "Sponsor registers not refreshed; using cached copies if any."
+
+      - run: jobfinder -v search --top 40
+
+      - name: Add the summary to the run page
+        run: cat reports/jobs.md >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jobfinder-report-${{ github.run_number }}
+          path: reports/
+          retention-days: 30
