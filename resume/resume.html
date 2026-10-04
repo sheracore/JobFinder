@@ -67,9 +67,8 @@ manual processes into automated, well-tested ones, and I mentor other engineers 
 <div class="job">
   <div class="job-head"><div><span class="role">Freelance Backend Engineer</span> &mdash; <span class="org">QueueLess</span> (Remote) &middot; <span class="context">event-driven virtual-queue SaaS</span></div><div class="when">2026 &ndash; Present</div></div>
   <ul>
-    <li>Designed a microservices architecture (Identity, Queue, Business, Notification, Analytics) with a database per service, Kafka domain events and synchronous HTTP queries.</li>
+    <li>Designed a microservices architecture (Identity, Queue, Business, Notification, Analytics) with a database per service and versioned Kafka domain events, published by idempotent producers keyed per queue for ordering.</li>
     <li>Built the core Queue Service with FastAPI, SQLAlchemy 2.x and PostgreSQL. Row-level locks and atomic compare-and-set state transitions guarantee <b>no duplicate tickets</b> and <b>exactly one winner</b> when concurrent actions race.</li>
-    <li>Published versioned domain events to Kafka with idempotent producers and per-queue partition keys for ordering. Containerized with Docker, ready for Kubernetes, and tested with pytest.</li>
   </ul>
 </div>
 
@@ -88,7 +87,8 @@ manual processes into automated, well-tested ones, and I mentor other engineers 
   <div class="job-head"><div><span class="role">Backend Engineer (Django)</span> &mdash; <span class="org">Learnwise</span> (Remote) &middot; <span class="context">Misalearn language-learning app</span></div><div class="when">Jul 2022 &ndash; Aug 2023</div></div>
   <ul>
     <li>Cut client requests for dictionary updates by <b>95%</b> by replacing per-word polling with encrypted JSON bundles generated periodically with Celery Beat.</li>
-    <li>Reached <b>100% API documentation coverage</b> by extending Swagger/OpenAPI generation for custom fields and django-filter, and built a reusable validation and metadata module used across the app.</li>
+    <li>Built a reusable Django module for metadata generation, data validation and key control that integrates with multiple modules and became a shared building block across the application.</li>
+    <li>Reached <b>100% API documentation coverage</b> with auto-generated Swagger/OpenAPI docs, overriding its schema classes to support every custom field type and django-filter endpoint.</li>
     <li>Developed and published an n8n community node, and integrated LLM-generated content into the product.</li>
   </ul>
 </div>
@@ -96,8 +96,10 @@ manual processes into automated, well-tested ones, and I mentor other engineers 
 <div class="job">
   <div class="job-head"><div><span class="role">Backend Engineer &amp; Data Analyst</span> &mdash; <span class="org">Farafan</span> (Tehran) &middot; <span class="context">telecom &amp; IT, 300+ employees</span></div><div class="when">Jun 2018 &ndash; Jun 2022</div></div>
   <ul>
-    <li>Built the Django backend of <b>VirusPaad</b>, a SaaS that scans files with <b>40+ antivirus engines</b>, orchestrating 40+ VMs via RPyC with Samba/FTPS file intake.</li>
-    <li>Automated <b>~80%</b> of manual telecom reporting by turning large-scale mobile network data in ClickHouse into KPIs in PostgreSQL, with dashboards in Grafana.</li>
+    <li>Built the Django backend of <b>VirusPaad</b>, a SaaS that scans uploaded files with <b>40+ antivirus engines</b> and serves both a web app and on-site kiosks.</li>
+    <li>Created a centralized control system for <b>40+ VMs</b> running antivirus engines, using RPyC for remote command execution to distribute scans and collect results.</li>
+    <li>Integrated Samba and FTPS for file transfer between the platform and scanning VMs, and aggregated per-engine verdicts to flag infected files.</li>
+    <li><b>Radio Patrol:</b> automated <b>~80%</b> of manual telecom reporting with scheduled jobs that turn large-scale mobile network data in ClickHouse into KPIs in PostgreSQL, visualized in Grafana dashboards.</li>
   </ul>
 </div>
 
