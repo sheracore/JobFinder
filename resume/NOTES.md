@@ -18,7 +18,7 @@ Files:
 | "7+ years" | "8 years" (Jun 2018 – 2026) | Matches your dates. |
 | "the largest exchange in the country" | "Iran's largest cryptocurrency exchange" | European recruiters do not know which country is meant. |
 | No location or relocation line | "Tehran, Iran · Open to relocation to Europe (EU Blue Card / work visa)" | Recruiters filter on this first. Saying it upfront avoids silent rejections. |
-| GitHub link pointed to `interview_backend` | `github.com/sheracore` | Your profile shows QueueLess and JobFinder. |
+| GitHub link pointed to `interview_backend` | `github.com/sheracore` | Your profile shows QueueLess. |
 | Flat skills list | Grouped skills, adding FastAPI, Kafka, Kubernetes, microservices, SQLAlchemy and Pydantic | Easier to scan, with the skills you asked to add. |
 | No current role | QueueLess listed as a freelance role (2026 – Present) | Covers the gap after May 2026 and shows FastAPI, Kafka and microservices. |
 | Bullets started with weak verbs and ended without a result | Each bullet has an action and an outcome, and numbers are in bold | Recruiters skim the numbers first. |
@@ -51,4 +51,4 @@ Files:
 - In *Open to work*, set the locations to Germany, Netherlands, Ireland, Sweden, Denmark, Poland, Portugal and Spain, set the visibility to
   "Recruiters only", and add the job titles "Backend Engineer", "Senior Python Developer", "Platform Engineer" and "Software Engineer".
 - Copy the Experience bullets from this resume into LinkedIn so both tell the same story.
-- Add QueueLess and JobFinder under *Featured*.
+- Add QueueLess under *Featured*.
