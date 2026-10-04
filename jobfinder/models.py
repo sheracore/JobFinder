@@ -1,22 +1,30 @@
 from __future__ import annotations
 
+import hashlib
 import html
 import re
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 
 _TAG_RE = re.compile(r"<[^>]+>")
-_WS_RE = re.compile(r"\s+")
+_SPACES_RE = re.compile(r"[ \t\r\f\v\xa0]+")
 
 
 def html_to_text(value: str | None) -> str:
-    """Strip HTML tags and entities. Greenhouse double-escapes its HTML, so unescape twice."""
+    """Strip HTML to plain text, keeping paragraphs and list items on their own lines.
+
+    Greenhouse double-escapes its HTML, so unescape twice.
+    """
     if not value:
         return ""
     text = html.unescape(html.unescape(value))
-    text = re.sub(r"(?i)<\s*(br|/p|/li|/div|/h\d)\s*/?>", "\n", text)
-    text = _TAG_RE.sub(" ", text)
-    return _WS_RE.sub(" ", text).strip()
+    text = re.sub(r"(?i)<\s*li[^>]*>", "\n• ", text)
+    text = re.sub(r"(?i)<\s*(br|/p|/div|/h\d|/ul|/ol|p|div|h\d)(\s[^>]*)?\s*/?>", "\n", text)
+    text = re.sub(r"(?i)<\s*/?\s*(td|th|tr|table)(\s[^>]*)?>", " ", text)
+    text = _TAG_RE.sub("", text)
+    lines = [_SPACES_RE.sub(" ", line).strip() for line in text.split("\n")]
+    text = "\n".join(lines)
+    return re.sub(r"\n{3,}", "\n\n", text).strip()
 
 
 def normalize(value: str) -> str:
@@ -37,6 +45,9 @@ class Job:
     tags: list[str] = field(default_factory=list)
     # True or False when the source itself flags sponsorship (for example Arbeitnow), None when unknown.
     source_visa_flag: bool | None = None
+    # Company logo: a direct image URL when the source provides one, otherwise a domain to look up an icon for.
+    logo_url: str = ""
+    company_domain: str = ""
 
     # Filled in by the pipeline.
     country: str | None = None
@@ -47,6 +58,10 @@ class Job:
     reasons: list[str] = field(default_factory=list)
     sources: list[str] = field(default_factory=list)
     is_new: bool = True
+
+    @property
+    def id(self) -> str:
+        return job_id_for_key(self.key)
 
     @property
     def key(self) -> str:
@@ -63,7 +78,19 @@ class Job:
         data = asdict(self)
         data["posted_at"] = self.posted_at.isoformat() if self.posted_at else None
         data["key"] = self.key
+        data["id"] = self.id
         return data
+
+
+def job_id_for_key(key: str) -> str:
+    return hashlib.sha1(key.encode("utf-8")).hexdigest()[:12]
+
+
+def job_from_dict(data: dict) -> Job:
+    fields = {f for f in Job.__dataclass_fields__}
+    job = Job(**{k: v for k, v in data.items() if k in fields})
+    job.posted_at = parse_datetime(data.get("posted_at"))
+    return job
 
 
 def parse_datetime(value) -> datetime | None:

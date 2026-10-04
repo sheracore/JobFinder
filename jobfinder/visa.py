@@ -101,18 +101,22 @@ def detect(text: str) -> VisaSignals:
             signals.evidence.append("✗ " + _snippet(remaining, match))
         remaining = pattern.sub(" ", remaining)
 
+    sponsor_at = None
     for pattern in SPONSOR_RE:
         match = pattern.search(remaining)
         if match:
             signals.sponsored = True
             signals.evidence.append("✓ " + _snippet(remaining, match))
+            sponsor_at = match.start()
             break
 
     for pattern in RELOCATION_RE:
         match = pattern.search(remaining)
         if match:
             signals.relocation = True
-            signals.evidence.append("✓ " + _snippet(remaining, match))
+            # Skip the snippet when it is the same sentence already quoted for sponsorship.
+            if sponsor_at is None or abs(match.start() - sponsor_at) > 120:
+                signals.evidence.append("✓ " + _snippet(remaining, match))
             break
 
     return signals

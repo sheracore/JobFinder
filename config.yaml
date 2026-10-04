@@ -60,19 +60,68 @@ sources:
   hackernews:
     enabled: true
     threads: 1          # latest monthly "Who is hiring?" thread
-  # Company career pages. Slugs are the part of the board URL after the host, e.g. boards.greenhouse.io/<slug>.
-  # Boards that do not exist (404) are skipped with a warning, so it is safe to add guesses.
+  # Company career pages. slug = the part of the board URL after the host, e.g. boards.greenhouse.io/<slug>.
+  # name is shown in the app; domain is used for the company logo and link. A slug that does not exist (404)
+  # is skipped with a warning, so it is safe to add guesses. A plain "slug" (no braces) also works.
   greenhouse:
     enabled: true
-    companies: [n26, sumup, hellofresh, getyourguide, contentful, celonis, babbel, taxfix, raisin, commercetools,
-                sennder, omio, traderepublicbank, monzo, intercom, stripe, cloudflare, mongodb, datadog, elastic,
-                grammarly, squarespace, anthropic, mollie, adyen, wolt, airbnb, gitlab, remotecom, bolt, pitch, blinkist]
+    companies:
+      - {slug: n26, name: "N26", domain: n26.com}
+      - {slug: sumup, name: "SumUp", domain: sumup.com}
+      - {slug: hellofresh, name: "HelloFresh", domain: hellofresh.com}
+      - {slug: getyourguide, name: "GetYourGuide", domain: getyourguide.com}
+      - {slug: contentful, name: "Contentful", domain: contentful.com}
+      - {slug: celonis, name: "Celonis", domain: celonis.com}
+      - {slug: babbel, name: "Babbel", domain: babbel.com}
+      - {slug: taxfix, name: "Taxfix", domain: taxfix.de}
+      - {slug: raisin, name: "Raisin", domain: raisin.com}
+      - {slug: commercetools, name: "commercetools", domain: commercetools.com}
+      - {slug: sennder, name: "sennder", domain: sennder.com}
+      - {slug: omio, name: "Omio", domain: omio.com}
+      - {slug: traderepublicbank, name: "Trade Republic", domain: traderepublic.com}
+      - {slug: monzo, name: "Monzo", domain: monzo.com}
+      - {slug: intercom, name: "Intercom", domain: intercom.com}
+      - {slug: stripe, name: "Stripe", domain: stripe.com}
+      - {slug: cloudflare, name: "Cloudflare", domain: cloudflare.com}
+      - {slug: mongodb, name: "MongoDB", domain: mongodb.com}
+      - {slug: datadog, name: "Datadog", domain: datadoghq.com}
+      - {slug: elastic, name: "Elastic", domain: elastic.co}
+      - {slug: grammarly, name: "Grammarly", domain: grammarly.com}
+      - {slug: squarespace, name: "Squarespace", domain: squarespace.com}
+      - {slug: anthropic, name: "Anthropic", domain: anthropic.com}
+      - {slug: mollie, name: "Mollie", domain: mollie.com}
+      - {slug: adyen, name: "Adyen", domain: adyen.com}
+      - {slug: wolt, name: "Wolt", domain: wolt.com}
+      - {slug: airbnb, name: "Airbnb", domain: airbnb.com}
+      - {slug: gitlab, name: "GitLab", domain: gitlab.com}
+      - {slug: remotecom, name: "Remote", domain: remote.com}
+      - {slug: bolt, name: "Bolt", domain: bolt.eu}
+      - {slug: pitch, name: "Pitch", domain: pitch.com}
+      - {slug: blinkist, name: "Blinkist", domain: blinkist.com}
   lever:
     enabled: true
-    companies: [spotify, mistral, palantir, qonto, veriff, pipedrive, wise]
+    companies:
+      - {slug: spotify, name: "Spotify", domain: spotify.com}
+      - {slug: mistral, name: "Mistral AI", domain: mistral.ai}
+      - {slug: palantir, name: "Palantir", domain: palantir.com}
+      - {slug: qonto, name: "Qonto", domain: qonto.com}
+      - {slug: veriff, name: "Veriff", domain: veriff.com}
+      - {slug: pipedrive, name: "Pipedrive", domain: pipedrive.com}
+      - {slug: wise, name: "Wise", domain: wise.com}
   ashby:
     enabled: true
-    companies: [n8n, elevenlabs, supabase, posthog, deepl, pleo, synthesia, openai, langchain, parloa, helsing]
+    companies:
+      - {slug: n8n, name: "n8n", domain: n8n.io}
+      - {slug: elevenlabs, name: "ElevenLabs", domain: elevenlabs.io}
+      - {slug: supabase, name: "Supabase", domain: supabase.com}
+      - {slug: posthog, name: "PostHog", domain: posthog.com}
+      - {slug: deepl, name: "DeepL", domain: deepl.com}
+      - {slug: pleo, name: "Pleo", domain: pleo.io}
+      - {slug: synthesia, name: "Synthesia", domain: synthesia.io}
+      - {slug: openai, name: "OpenAI", domain: openai.com}
+      - {slug: langchain, name: "LangChain", domain: langchain.com}
+      - {slug: parloa, name: "Parloa", domain: parloa.com}
+      - {slug: helsing, name: "Helsing", domain: helsing.ai}
   # LinkedIn / Indeed / Glassdoor via python-jobspy (pip install -e ".[linkedin]"). Off by default.
   jobspy:
     enabled: false
@@ -82,6 +131,16 @@ sources:
     results_per_search: 30
     hours_old: 336
     fetch_descriptions: true
+
+# Cover letters (`jobfinder web` → Generate cover letter).
+cover_letter:
+  resume: resume/resume.html        # the facts letters are allowed to use
+  candidate_name: Mohammad Ghaffary
+  # Anything true that is not in the resume and should inform every letter, e.g. notice period or availability.
+  extra_context: ""
+  use_claude: true                  # needs ANTHROPIC_API_KEY; without it a template letter is used
+  model: claude-opus-5-5
+  effort: high
 
 database: data/jobs.db
 sponsors_dir: data/sponsors

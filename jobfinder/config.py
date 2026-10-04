@@ -29,6 +29,17 @@ class Search:
 
 
 @dataclass
+class CoverLetterConfig:
+    resume: str = "resume/resume.html"
+    candidate_name: str = "Mohammad Ghaffary"
+    # Anything true that is not in the resume and should inform letters (availability, notice period, ...).
+    extra_context: str = ""
+    use_claude: bool = True
+    model: str = "claude-opus-5-5"
+    effort: str = "high"
+
+
+@dataclass
 class Config:
     profile: Profile = field(default_factory=Profile)
     search: Search = field(default_factory=Search)
@@ -36,6 +47,7 @@ class Config:
     database: str = "data/jobs.db"
     sponsors_dir: str = "data/sponsors"
     output_dir: str = "reports"
+    cover_letter: CoverLetterConfig = field(default_factory=CoverLetterConfig)
 
     def source_enabled(self, name: str) -> bool:
         return bool(self.sources.get(name, {}).get("enabled", False))
@@ -57,4 +69,5 @@ def load_config(path: str | Path) -> Config:
         database=raw.get("database", "data/jobs.db"),
         sponsors_dir=raw.get("sponsors_dir", "data/sponsors"),
         output_dir=raw.get("output_dir", "reports"),
+        cover_letter=CoverLetterConfig(**(raw.get("cover_letter") or {})),
     )

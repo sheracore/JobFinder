@@ -11,7 +11,7 @@ import re
 import httpx
 
 from ..models import Job, html_to_text, parse_datetime
-from .base import get_json, register
+from .base import domain_from_url, get_json, register
 
 ALGOLIA = "https://hn.algolia.com/api/v1"
 _VISA_RE = re.compile(r"\bvisa\b|relocat", re.I)
@@ -20,6 +20,14 @@ _VISA_RE = re.compile(r"\bvisa\b|relocat", re.I)
 def _first_line(html_text: str) -> str:
     first = re.split(r"(?i)<p>|\n", html_text or "", maxsplit=1)[0]
     return html_to_text(first)
+
+
+def _first_domain(html_text: str) -> str:
+    for match in re.finditer(r'href="([^"]+)"', html_text or ""):
+        domain = domain_from_url(match.group(1).replace("&#x2F;", "/"))
+        if domain:
+            return domain
+    return ""
 
 
 @register("hackernews")
@@ -50,4 +58,5 @@ def hackernews(client: httpx.Client, options: dict, keywords: list[str]):
                 location=location[:200],
                 description=html_to_text(raw),
                 posted_at=parse_datetime(comment.get("created_at_i") or comment.get("created_at")),
+                company_domain=_first_domain(raw),
             )

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JobFinder</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%231f5fae'/><path d='M9 13h14v10H9z' fill='none' stroke='white' stroke-width='2'/><path d='M13 13v-3h6v3' fill='none' stroke='white' stroke-width='2'/></svg>">
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <div>
+      <div class="brand-name">JobFinder</div>
+      <div class="brand-sub" id="summary">Visa-sponsorship jobs in Europe</div>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <span class="search-state" id="searchState" role="status" aria-live="polite"></span>
+    <button class="btn" id="refreshBtn" type="button">Find new jobs</button>
+  </div>
+</header>
+
+<section class="filters" aria-label="Filters">
+  <input type="search" id="q" placeholder="Search title, company, skill…" aria-label="Search">
+  <select id="visa" aria-label="Visa">
+    <option value="">Any visa signal</option>
+    <option value="sponsored">Visa sponsored</option>
+    <option value="relocation">Relocation support</option>
+    <option value="likely">Known sponsor</option>
+    <option value="unknown">Not mentioned</option>
+  </select>
+  <select id="country" aria-label="Country"><option value="">All countries</option></select>
+  <select id="status" aria-label="Status">
+    <option value="open">To review</option>
+    <option value="saved">Saved</option>
+    <option value="applied">Applied</option>
+    <option value="hidden">Hidden</option>
+    <option value="all">All</option>
+  </select>
+  <select id="sort" aria-label="Sort">
+    <option value="score">Best match</option>
+    <option value="posted">Newest</option>
+    <option value="company">Company A–Z</option>
+  </select>
+  <label class="check"><input type="checkbox" id="onlyNew"> New only</label>
+</section>
+
+<main class="layout">
+  <section class="list" id="list" aria-label="Jobs"></section>
+  <section class="detail" id="detail" aria-label="Job details">
+    <div class="empty-detail">Select a job to see the full description and write a cover letter.</div>
+  </section>
+</main>
+
+<template id="emptyState">
+  <div class="empty">
+    <h2>No jobs yet</h2>
+    <p>Click <b>Find new jobs</b>, or run <code>jobfinder search</code> in a terminal. It scans job boards and company
+      career pages, which takes about a minute.</p>
+  </div>
+</template>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

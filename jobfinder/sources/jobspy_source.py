@@ -70,4 +70,5 @@ def jobspy(client: httpx.Client, options: dict, keywords: list[str]):
                     posted_at=parse_datetime(str(_clean(row.get("date_posted")) or "")),
                     remote=_clean(row.get("is_remote")),
                     salary=salary,
+                    logo_url=str(_clean(row.get("company_logo")) or ""),
                 )

@@ -64,6 +64,7 @@ def remotive(client: httpx.Client, options: dict, keywords: list[str]):
                 remote=True,
                 salary=item.get("salary") or "",
                 tags=list(item.get("tags") or []),
+                logo_url=item.get("company_logo") or item.get("company_logo_url") or "",
             )
 
 
@@ -88,4 +89,5 @@ def remoteok(client: httpx.Client, options: dict, keywords: list[str]):
             remote=True,
             salary=salary,
             tags=list(item.get("tags") or []),
+            logo_url=item.get("company_logo") or item.get("logo") or "",
         )

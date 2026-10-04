@@ -45,6 +45,34 @@ jobfinder -v search                                 # show per-source counts and
 jobfinder sources                                   # list sources
 ```
 
+## Web app: browse jobs and write cover letters
+
+```bash
+pip install -e ".[web]"
+export ANTHROPIC_API_KEY=sk-ant-...   # optional, for cover letters written by Claude
+jobfinder web                          # then open http://127.0.0.1:8000
+```
+
+- **Job list:** each job shows the company logo, match score, visa signal, country, posting age and salary when
+  known. You can filter by text, visa signal, country and status, and sort by match, newest or company.
+- **Job page:** click a job to see the full job description, the exact sentences about visas and relocation, why it
+  scored the way it did, and an **Apply on company site** button.
+- **Tracking:** mark jobs as *Saved*, *Applied* or *Hidden*. The status is kept across searches.
+- **Generate cover letter:** writes a letter for that company from your resume (`resume/resume.html`) and the job
+  description. Claude is told to use only facts from your resume (no invented numbers or skills), to link two or
+  three of your real achievements to the job's main requirements, and to mention the visa sponsorship you need in one
+  plain sentence. You can add notes such as "available from January", edit the letter, copy it, download it as
+  `.txt`, and keep several versions.
+  - Without an API key the app still works: it builds a template letter from the resume bullets that best match the
+    job, and it says so.
+  - Settings are in the `cover_letter:` section of `config.yaml`: the model (default `claude-opus-5-5`), the effort
+    level, and `extra_context` for facts that should go into every letter.
+- **Find new jobs:** runs a fresh search from the app.
+- **Logos:** they come from the job source when it provides one, otherwise from the company `domain` in
+  `config.yaml`, and fall back to coloured initials.
+
+The app only listens on your own computer (127.0.0.1). Job descriptions are shown as plain text, never as HTML.
+
 ### LinkedIn, Indeed and Glassdoor
 
 ```bash
@@ -102,7 +130,8 @@ pip install -e ".[dev]"
 pytest
 ```
 
-Tests use recorded API responses (`tests/conftest.py`) and need no network.
+Tests use recorded API responses (`tests/conftest.py`) and need no network. That includes the web API and the cover
+letter template.
 
 ## Also in this repository
 

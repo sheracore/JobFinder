@@ -34,17 +34,17 @@ def _safe(fetch):
     return run
 
 
-def _company(entry) -> tuple[str, str]:
-    """A company entry is either "slug" or {"slug": ..., "name": ...}."""
+def _company(entry) -> tuple[str, str, str]:
+    """A company entry is either "slug" or {"slug": ..., "name": ..., "domain": ...}."""
     if isinstance(entry, dict):
-        return entry["slug"], entry.get("name") or entry["slug"]
-    return str(entry), str(entry)
+        return entry["slug"], entry.get("name") or entry["slug"], entry.get("domain", "")
+    return str(entry), str(entry), ""
 
 
 @register("greenhouse")
 def greenhouse(client: httpx.Client, options: dict, keywords: list[str]):
     def fetch(entry):
-        slug, name = _company(entry)
+        slug, name, domain = _company(entry)
         data = get_json(client, f"https://boards-api.greenhouse.io/v1/boards/{slug}/jobs", params={"content": "true"})
         for item in (data or {}).get("jobs") or []:
             offices = ", ".join(o.get("name", "") for o in item.get("offices") or [] if o.get("name"))
@@ -55,6 +55,7 @@ def greenhouse(client: httpx.Client, options: dict, keywords: list[str]):
                 source="greenhouse",
                 title=item.get("title", ""),
                 company=name,
+                company_domain=domain,
                 url=item.get("absolute_url", ""),
                 location=location,
                 description=html_to_text(item.get("content")),
@@ -68,7 +69,7 @@ def greenhouse(client: httpx.Client, options: dict, keywords: list[str]):
 @register("lever")
 def lever(client: httpx.Client, options: dict, keywords: list[str]):
     def fetch(entry):
-        slug, name = _company(entry)
+        slug, name, domain = _company(entry)
         data = get_json(client, f"https://api.lever.co/v0/postings/{slug}", params={"mode": "json"})
         if data is None:  # Companies hosted on Lever's EU instance.
             data = get_json(client, f"https://api.eu.lever.co/v0/postings/{slug}", params={"mode": "json"})
@@ -85,6 +86,7 @@ def lever(client: httpx.Client, options: dict, keywords: list[str]):
                 source="lever",
                 title=item.get("text", ""),
                 company=name,
+                company_domain=domain,
                 url=item.get("hostedUrl", ""),
                 location=", ".join(loc for loc in locations if loc),
                 description=description,
@@ -99,7 +101,7 @@ def lever(client: httpx.Client, options: dict, keywords: list[str]):
 @register("ashby")
 def ashby(client: httpx.Client, options: dict, keywords: list[str]):
     def fetch(entry):
-        slug, name = _company(entry)
+        slug, name, domain = _company(entry)
         data = get_json(client, f"https://api.ashbyhq.com/posting-api/job-board/{slug}",
                         params={"includeCompensation": "true"})
         for item in (data or {}).get("jobs") or []:
@@ -115,6 +117,7 @@ def ashby(client: httpx.Client, options: dict, keywords: list[str]):
                 source="ashby",
                 title=item.get("title", ""),
                 company=name,
+                company_domain=domain,
                 url=item.get("jobUrl", ""),
                 location=location,
                 description=item.get("descriptionPlain") or html_to_text(item.get("descriptionHtml")),

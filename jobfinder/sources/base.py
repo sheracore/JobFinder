@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import time
 from typing import Callable, Iterable
+from urllib.parse import urlparse
 
 import httpx
 
@@ -23,6 +24,26 @@ def register(name: str):
         return fn
 
     return wrap
+
+
+# Hosts that belong to job boards or applicant-tracking systems, not to the hiring company.
+_NOT_COMPANY_HOSTS = ("greenhouse.io", "lever.co", "ashbyhq.com", "arbeitnow.com", "remotive.com", "remoteok.com",
+                      "ycombinator.com", "linkedin.com", "indeed.com", "glassdoor.com", "workable.com",
+                      "smartrecruiters.com", "personio.de", "personio.com", "recruitee.com", "teamtailor.com",
+                      "bamboohr.com", "myworkdayjobs.com", "join.com", "wellfound.com", "github.com", "google.com",
+                      "forms.gle", "notion.site", "calendly.com")
+
+
+def domain_from_url(url: str) -> str:
+    """The company's own domain from a URL, or "" when the URL points at a job board or ATS."""
+    try:
+        host = (urlparse(url).hostname or "").lower()
+    except ValueError:
+        return ""
+    host = host.removeprefix("www.").removeprefix("careers.").removeprefix("jobs.")
+    if not host or "." not in host or any(host == h or host.endswith("." + h) for h in _NOT_COMPANY_HOSTS):
+        return ""
+    return host
 
 
 def make_client(transport: httpx.BaseTransport | None = None) -> httpx.Client:

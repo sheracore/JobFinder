@@ -16,15 +16,20 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# The browser app (`jobfinder web`) and Claude-written cover letters.
+web = ["fastapi>=0.110", "uvicorn>=0.30", "anthropic>=1.0"]
 # LinkedIn, Indeed and Glassdoor have no public job APIs; JobSpy reads their public search pages.
 linkedin = ["python-jobspy>=1.1.80"]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "fastapi>=0.110", "uvicorn>=0.30", "anthropic>=1.0"]
 
 [project.scripts]
 jobfinder = "jobfinder.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["jobfinder*"]
+
+[tool.setuptools.package-data]
+"jobfinder.web" = ["static/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
