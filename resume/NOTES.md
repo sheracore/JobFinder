@@ -7,7 +7,7 @@ Files:
   chromium --headless --no-pdf-header-footer --print-to-pdf=Mohammad_Ghaffary_Resume.pdf resume.html
   ```
   (or open it in Chrome and use Print → Save as PDF, margins "Default", headers/footers off).
-- `Mohammad_Ghaffary_Resume.pdf` is the version to send.
+- `Mohammad_Ghaffary_Resume.pdf` is the version to send (one page, A4).
 
 ## What changed compared with the previous resume
 
