@@ -56,18 +56,30 @@ class Config:
         return self.sources.get(name, {}) or {}
 
 
+def _country_code(value) -> str:
+    # YAML 1.1 reads an unquoted NO (Norway) as False.
+    return "NO" if value is False else str(value).upper()
+
+
 def load_config(path: str | Path) -> Config:
     raw = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
     profile = Profile(**(raw.get("profile") or {}))
     search_raw = dict(raw.get("search") or {})
-    search_raw["countries"] = {str(k).upper(): float(v) for k, v in (search_raw.get("countries") or {}).items()}
+    search_raw["countries"] = {_country_code(k): float(v) for k, v in (search_raw.get("countries") or {}).items()}
     search = Search(**search_raw)
     return Config(
         profile=profile,
         search=search,
-        sources=raw.get("sources") or {},
+        sources=_fix_jobspy_countries(raw.get("sources") or {}),
         database=raw.get("database", "data/jobs.db"),
         sponsors_dir=raw.get("sponsors_dir", "data/sponsors"),
         output_dir=raw.get("output_dir", "reports"),
         cover_letter=CoverLetterConfig(**(raw.get("cover_letter") or {})),
     )
+
+
+def _fix_jobspy_countries(sources: dict) -> dict:
+    jobspy = sources.get("jobspy") or {}
+    if jobspy.get("countries"):
+        jobspy["countries"] = [_country_code(c) for c in jobspy["countries"]]
+    return sources

@@ -25,13 +25,6 @@ _INDEED_COUNTRIES = {"DE": "germany", "NL": "netherlands", "IE": "ireland", "GB"
                      "CZ": "czech republic", "LU": "luxembourg"}
 
 
-def countries_option(value) -> list[str]:
-    """`countries` may be a list of ISO codes or "all" for every European country JobFinder knows."""
-    if isinstance(value, str) and value.strip().lower() == "all":
-        return list(COUNTRY_NAMES)
-    return [str(code).upper() for code in (value or ["DE", "NL"])]
-
-
 def sites_for(code: str, sites: list[str]) -> list[str]:
     """Indeed and Glassdoor only run on their supported regional sites; LinkedIn works everywhere."""
     if code in _INDEED_COUNTRIES:
@@ -55,7 +48,7 @@ def jobspy(client: httpx.Client, options: dict, keywords: list[str]):
 
     sites = options.get("sites") or ["linkedin", "indeed"]
     terms = options.get("search_terms") or [f"{k} visa sponsorship" for k in keywords]
-    for code in countries_option(options.get("countries")):
+    for code in [str(c).upper() for c in options.get("countries") or ["DE", "NL"]]:
         country_sites = sites_for(code, sites)
         if not country_sites:
             continue

@@ -1,5 +1,5 @@
-from jobfinder.location import COUNTRY_NAMES, detect_countries, detect_country, is_europe_region, is_outside_europe
-from jobfinder.sources.jobspy_source import countries_option, sites_for
+from jobfinder.location import detect_countries, detect_country, is_europe_region, is_outside_europe
+from jobfinder.sources.jobspy_source import sites_for
 from jobfinder.sponsors import SponsorIndex, core_name
 
 
@@ -37,7 +37,15 @@ def test_sponsor_matching(tmp_path):
 
 
 def test_jobspy_country_options():
-    assert len(countries_option("all")) == len(COUNTRY_NAMES) >= 30
-    assert countries_option(["de", "nl"]) == ["DE", "NL"]
     assert sites_for("DE", ["linkedin", "indeed"]) == ["linkedin", "indeed"]
     assert sites_for("GR", ["linkedin", "indeed", "glassdoor"]) == ["linkedin"]
+
+
+def test_unquoted_norway_in_config(tmp_path):
+    from jobfinder.config import load_config
+
+    path = tmp_path / "config.yaml"
+    path.write_text("search:\n  countries:\n    NO: 0.8\nsources:\n  jobspy:\n    countries: [DE, NO]\n")
+    config = load_config(path)
+    assert config.search.countries == {"NO": 0.8}
+    assert config.source_options("jobspy")["countries"] == ["DE", "NO"]
