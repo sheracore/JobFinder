@@ -112,4 +112,7 @@ def config():
     }
     cfg.search.keywords = ["python"]
     cfg.search.min_score = 0
+    # The ranking tests cover remote-Europe jobs and unlisted countries; test_scoring covers the stricter settings.
+    cfg.search.include_remote_europe = True
+    cfg.search.only_listed_countries = False
     return cfg

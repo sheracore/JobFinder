@@ -1,4 +1,4 @@
-"""Map free-text job locations to European ISO country codes."""
+"""Map free-text job locations to ISO country codes (European countries and Canada)."""
 
 from __future__ import annotations
 
@@ -43,6 +43,9 @@ COUNTRIES: dict[str, tuple[str, ...]] = {
     "SK": ("slovakia", "bratislava", "kosice", "košice"),
     "RS": ("serbia", "belgrade", "novi sad"),
     "IS": ("iceland", "reykjavik"),
+    "CA": ("canada", "toronto", "vancouver", "montreal", "montréal", "ottawa", "calgary", "edmonton", "waterloo",
+           "kitchener", "winnipeg", "halifax", "victoria, bc", "quebec city", "ontario", "british columbia", "alberta",
+           "quebec", "québec"),
 }
 
 COUNTRY_NAMES = {
@@ -51,6 +54,7 @@ COUNTRY_NAMES = {
     "BE": "Belgium", "LU": "Luxembourg", "FR": "France", "ES": "Spain", "PT": "Portugal", "IT": "Italy",
     "GB": "United Kingdom", "GR": "Greece", "CY": "Cyprus", "MT": "Malta", "RO": "Romania", "BG": "Bulgaria",
     "HU": "Hungary", "HR": "Croatia", "SI": "Slovenia", "SK": "Slovakia", "RS": "Serbia", "IS": "Iceland",
+    "CA": "Canada",
 }
 
 # Regions that mean "somewhere in Europe" but not a specific country.
@@ -58,7 +62,7 @@ EUROPE_REGION_RE = re.compile(r"\b(europe|european union|\beu\b|emea|eea|dach|be
 
 # Locations that are clearly outside Europe; used to skip "Remote - US" style postings.
 NON_EUROPE_RE = re.compile(
-    r"\b(united states|usa|u\.s\.|us only|canada|toronto|vancouver|new york|nyc|san francisco|seattle|austin|boston|"
+    r"\b(united states|usa|u\.s\.|us only|new york|nyc|san francisco|seattle|austin|boston|"
     r"chicago|los angeles|denver|india|bangalore|bengaluru|hyderabad|pune|singapore|australia|sydney|melbourne|"
     r"brazil|são paulo|sao paulo|mexico|argentina|japan|tokyo|china|hong kong|israel|tel aviv|dubai|uae|"
     r"philippines|south africa|nigeria|kenya|latam|americas|apac)\b",

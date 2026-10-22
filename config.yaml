@@ -19,45 +19,39 @@ profile:
 
 search:
   keywords: [python, backend, django]
-  # Country weight between 0 and 1 (20 points × weight). Germany and the Netherlands have the most predictable
-  # routes for non-EU engineers (EU Blue Card / Highly Skilled Migrant), so they rank highest.
-  # Every European country JobFinder recognises, one per line. Delete a line (or set it to 0) to drop that
-  # country's influence; raise a weight to rank its jobs higher.
+  # Countries where you can get citizenship while keeping your Iranian citizenship, so you can hold two
+  # passports. Weight between 0 and 1 (20 points × weight): higher = faster citizenship and a better job market.
+  # Rules change; check the official site of each country before relying on these notes.
   countries:
-    DE: 1.0    # Germany
-    NL: 1.0    # Netherlands
-    IE: 0.9    # Ireland
-    AT: 0.85   # Austria
-    SE: 0.85   # Sweden
-    DK: 0.85   # Denmark
-    FI: 0.8    # Finland
-    "NO": 0.8  # Norway (quoted: YAML reads a bare NO as "false")
-    EE: 0.8    # Estonia
-    GB: 0.8    # United Kingdom
-    LU: 0.75   # Luxembourg
-    BE: 0.75   # Belgium
-    PT: 0.75   # Portugal
-    ES: 0.75   # Spain
-    CH: 0.7    # Switzerland
-    PL: 0.7    # Poland
-    CZ: 0.7    # Czechia
-    LT: 0.7    # Lithuania
-    LV: 0.65   # Latvia
-    FR: 0.65   # France
-    IT: 0.6    # Italy
-    IS: 0.6    # Iceland
-    MT: 0.6    # Malta
-    CY: 0.6    # Cyprus
-    SI: 0.55   # Slovenia
-    SK: 0.55   # Slovakia
-    HU: 0.55   # Hungary
-    HR: 0.55   # Croatia
-    RO: 0.55   # Romania
-    BG: 0.55   # Bulgaria
-    GR: 0.55   # Greece
-    RS: 0.5    # Serbia
+    DE: 1.0    # Germany: dual citizenship allowed since 2024; citizenship after 5 years
+    CA: 1.0    # Canada: dual allowed; citizenship after 3 of 5 years; Canadians can work in the US on a TN visa
+    IE: 0.9    # Ireland: dual allowed; 5 years
+    NL: 0.85   # Netherlands: normally must renounce, but Iranians are usually exempt because Iran does not
+               #   allow renouncing. Confirm with the IND before relying on it.
+    BE: 0.8    # Belgium: dual allowed; 5 years
+    LU: 0.8    # Luxembourg: dual allowed; 5 years
+    FR: 0.75   # France: dual allowed; 5 years
+    GB: 0.75   # United Kingdom: dual allowed; about 6 years (a 10-year rule has been proposed)
+    SE: 0.7    # Sweden: dual allowed; 8 years since June 2026
+    FI: 0.7    # Finland: dual allowed; 8 years
+    "NO": 0.7  # Norway: dual allowed since 2020; 8 years (quoted: YAML reads a bare NO as "false")
+    PL: 0.65   # Poland: no renunciation required; about 8 years
+    DK: 0.6    # Denmark: dual allowed since 2015; 9 years and strict tests
+    CZ: 0.6    # Czechia: dual allowed since 2014; about 10 years
+    IS: 0.55   # Iceland: dual allowed; 7 years
+    CH: 0.55   # Switzerland: dual allowed; 10 years
+    GR: 0.5    # Greece: dual allowed; 7 years
+    MT: 0.5    # Malta: dual allowed
+    CY: 0.5    # Cyprus: dual allowed
+    IT: 0.5    # Italy: dual allowed; 10 years
+    PT: 0.5    # Portugal: dual allowed; 10 years since May 2026
+    HU: 0.45   # Hungary: dual allowed; Hungarian language test
+    RO: 0.45   # Romania: dual allowed; 8 years, Romanian language test
+    # Not listed because you would normally have to give up your Iranian citizenship (or the rules are
+    # unclear): Austria, Estonia, Latvia, Lithuania, Spain, Slovakia, Slovenia, Croatia, Bulgaria, Serbia.
   other_europe_weight: 0.5
-  include_remote_europe: true
+  only_listed_countries: true  # drop jobs that are only in countries not listed above
+  include_remote_europe: false # remote jobs do not give you residence, so they do not lead to citizenship
   include_not_offered: false   # drop postings that say they do not sponsor
   require_visa_signal: false   # true = only keep jobs with a sponsorship, relocation or known-sponsor signal
   max_age_days: 45
@@ -114,6 +108,7 @@ sources:
       - {slug: bolt, name: "Bolt", domain: bolt.eu}
       - {slug: pitch, name: "Pitch", domain: pitch.com}
       - {slug: blinkist, name: "Blinkist", domain: blinkist.com}
+      - {slug: faire, name: "Faire", domain: faire.com}                 # Canada (Toronto, Waterloo)
   lever:
     enabled: true
     companies:
@@ -124,6 +119,8 @@ sources:
       - {slug: veriff, name: "Veriff", domain: veriff.com}
       - {slug: pipedrive, name: "Pipedrive", domain: pipedrive.com}
       - {slug: wise, name: "Wise", domain: wise.com}
+      - {slug: clio, name: "Clio", domain: clio.com}                    # Canada (Vancouver, Toronto)
+      - {slug: wealthsimple, name: "Wealthsimple", domain: wealthsimple.com}  # Canada (Toronto)
   ashby:
     enabled: true
     companies:
@@ -138,46 +135,39 @@ sources:
       - {slug: langchain, name: "LangChain", domain: langchain.com}
       - {slug: parloa, name: "Parloa", domain: parloa.com}
       - {slug: helsing, name: "Helsing", domain: helsing.ai}
-  # LinkedIn / Indeed / Glassdoor via python-jobspy (pip install -e ".[linkedin]"). Off by default.
+      - {slug: cohere, name: "Cohere", domain: cohere.com}              # Canada (Toronto)
+      - {slug: 1password, name: "1Password", domain: 1password.com}     # Canada (Toronto)
+  # LinkedIn / Indeed / Glassdoor via python-jobspy. Needs: pip install -e ".[linkedin]"
   jobspy:
-    enabled: false
+    enabled: true
     sites: [linkedin, indeed]
-    # Countries to search on LinkedIn/Indeed, one per line. Comment a line in (remove the "# ") to add it.
-    # Each country takes about 1-3 minutes, and many at once may get you rate-limited by LinkedIn.
-    # Countries marked (LinkedIn only) have no Indeed site, so only LinkedIn is searched there.
+    # Countries searched on LinkedIn/Indeed, one per line; put "# " in front of a line to skip that country.
+    # Each country takes about 1-3 minutes, and LinkedIn may rate-limit you if you search many too often.
+    # (LinkedIn only) = Indeed has no site for that country.
     countries:
       - DE   # Germany
-      - NL   # Netherlands
+      - CA   # Canada
       - IE   # Ireland
+      - NL   # Netherlands
+      - BE   # Belgium
+      - LU   # Luxembourg
+      - FR   # France
+      - GB   # United Kingdom
       - SE   # Sweden
-      # - AT   # Austria
-      # - DK   # Denmark
-      # - FI   # Finland
-      # - "NO" # Norway
-      # - EE   # Estonia (LinkedIn only)
-      # - GB   # United Kingdom
-      # - LU   # Luxembourg
-      # - BE   # Belgium
-      # - PT   # Portugal
-      # - ES   # Spain
-      # - CH   # Switzerland
-      # - PL   # Poland
-      # - CZ   # Czechia
-      # - LT   # Lithuania (LinkedIn only)
-      # - LV   # Latvia (LinkedIn only)
-      # - FR   # France
-      # - IT   # Italy
-      # - IS   # Iceland (LinkedIn only)
-      # - MT   # Malta (LinkedIn only)
-      # - CY   # Cyprus (LinkedIn only)
-      # - SI   # Slovenia (LinkedIn only)
-      # - SK   # Slovakia (LinkedIn only)
-      # - HU   # Hungary (LinkedIn only)
-      # - HR   # Croatia (LinkedIn only)
-      # - RO   # Romania (LinkedIn only)
-      # - BG   # Bulgaria (LinkedIn only)
-      # - GR   # Greece (LinkedIn only)
-      # - RS   # Serbia (LinkedIn only)
+      - FI   # Finland
+      - "NO" # Norway
+      - PL   # Poland
+      - DK   # Denmark
+      - CZ   # Czechia
+      - IS   # Iceland (LinkedIn only)
+      - CH   # Switzerland
+      - GR   # Greece (LinkedIn only)
+      - MT   # Malta (LinkedIn only)
+      - CY   # Cyprus (LinkedIn only)
+      - IT   # Italy
+      - PT   # Portugal
+      - HU   # Hungary (LinkedIn only)
+      - RO   # Romania (LinkedIn only)
     search_terms: ["python backend visa sponsorship", "senior python developer relocation"]
     results_per_search: 30
     hours_old: 336

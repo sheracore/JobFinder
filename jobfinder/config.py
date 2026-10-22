@@ -21,6 +21,8 @@ class Search:
     # ISO code -> weight between 0 and 1. Countries not listed but in Europe get `other_europe_weight`.
     countries: dict[str, float] = field(default_factory=dict)
     other_europe_weight: float = 0.5
+    # True: drop jobs whose country is not in `countries` (instead of giving them `other_europe_weight`).
+    only_listed_countries: bool = False
     include_remote_europe: bool = True
     include_not_offered: bool = False
     require_visa_signal: bool = False

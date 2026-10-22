@@ -56,6 +56,10 @@ class Scorer:
         # Location.
         countries = loc.detect_countries(job.location)
         weights = search.countries
+        if search.only_listed_countries:
+            countries = [c for c in countries if weights.get(c, 0) > 0]
+            if not countries and loc.detect_countries(job.location):
+                return None  # only in countries you did not list
         if countries:
             best = max(countries, key=lambda c: weights.get(c, search.other_europe_weight))
             job.country = best

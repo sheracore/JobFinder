@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 _INDEED_COUNTRIES = {"DE": "germany", "NL": "netherlands", "IE": "ireland", "GB": "uk", "FR": "france", "ES": "spain",
                      "PT": "portugal", "IT": "italy", "PL": "poland", "AT": "austria", "CH": "switzerland",
                      "BE": "belgium", "SE": "sweden", "DK": "denmark", "FI": "finland", "NO": "norway",
-                     "CZ": "czech republic", "LU": "luxembourg"}
+                     "CZ": "czech republic", "LU": "luxembourg", "CA": "canada"}
 
 
 def sites_for(code: str, sites: list[str]) -> list[str]:

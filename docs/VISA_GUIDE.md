@@ -15,6 +15,40 @@ link before relying on a number.** The figures below are the ones I know of as o
 | 🇵🇹 Portugal, 🇪🇸 Spain, 🇵🇱 Poland, 🇪🇪 Estonia | EU Blue Card or national highly-qualified routes | Lower salaries, but processes are relatively easy, and Estonia runs digital-first immigration. | — |
 | 🇬🇧 United Kingdom | **Skilled Worker visa** | Not in the EU, but a big market. The employer must hold a sponsor licence (also checked by `jobfinder`). | [gov.uk](https://www.gov.uk/skilled-worker-visa) |
 
+## Keeping Iranian citizenship, and moving on to the US later
+
+Iran does not let its citizens give up Iranian citizenship in practice, and it treats you only as Iranian
+inside Iran, so you always enter Iran on your Iranian passport. What matters is whether the *new* country
+makes you renounce. `config.yaml` (`search.countries`) only lists countries where you can keep both.
+
+| Allowed: you keep both | Not allowed or unclear: excluded from the search |
+| --- | --- |
+| Germany (5 years), Canada (3 of 5 years), Ireland (5), Belgium (5), Luxembourg (5), France (5), UK (about 6), Sweden (8, since June 2026), Finland (8), Norway (8), Poland (about 8), Denmark (9), Czechia (about 10), Iceland (7), Switzerland (10), Greece (7), Malta, Cyprus, Italy (10), Portugal (10, since May 2026), Hungary, Romania (8) | Austria, Estonia, Latvia, Lithuania, Spain, Slovakia, Slovenia, Croatia, Bulgaria, Serbia |
+
+The years are roughly how long you must live there before applying, and they keep changing. The
+**Netherlands** normally requires renouncing, but Iranians are usually exempt because Iranian law does not
+allow it. That comes from lawyers' summaries, not an official IND statement, so confirm it with the IND
+before counting on it.
+
+**Moving to the US afterwards.** The US travel ban in force since January 2026 fully suspends visas for Iranian
+nationals, but it exempts dual nationals who travel on a passport from a country that is not on the list. So a
+German, Canadian or other EU passport is what opens US visas again. Two limits remain:
+
+- You still need a US visa. Dual Iranian nationals cannot use the Visa Waiver Program (ESTA), even with an EU
+  passport.
+- A USCIS policy memo puts holds on immigration applications (such as green cards) from nationals of listed
+  countries, and reports say it does not clearly exempt dual nationals.
+
+**Canada is the strongest stepping stone.** After Canadian citizenship (3 years of residence out of 5), you can work
+in the US on a **TN visa**, which only Canadian and Mexican citizens can get. Software roles often qualify
+under the "Computer Systems Analyst" category. Canada's main route is **Express Entry** permanent residence,
+which you apply for yourself, without an employer sponsor. A high IELTS score matters a lot. A job offer helps
+less than it used to, because job-offer points were removed in 2025. Postings that mention **LMIA** or the
+**Global Talent Stream** mean the employer can sponsor a work permit, and JobFinder marks them as sponsored.
+
+US rules change often. Check the current State Department guidance, or ask an immigration lawyer, before you
+plan around them.
+
 ## Things that matter for an Iranian applicant
 
 - **Sanctions compliance.** Some US-headquartered companies, and some payment or crypto companies, cannot hire Iranian

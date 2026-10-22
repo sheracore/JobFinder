@@ -22,6 +22,7 @@ _NEG = [
     r"(?:eu|eea|uk|swiss)\s+(?:citizens?|nationals?|passport holders?)\s+only",
     r"only\s+(?:\w+\s+){0,4}?(?:candidates|applicants)\s+(?:\w+\s+){0,6}?(?:right to work|work permit|work authori[sz]ation|eu citizenship)",
     r"(?:right to work|work authori[sz]ation)\s+in\s+(?:the\s+)?[a-z ]{2,20}\s+(?:is\s+)?(?:required|mandatory|needed|essential)",
+    r"(?:must|should|need to)\s+be\s+(?:legally\s+)?(?:eligible|authori[sz]ed|entitled|permitted)\s+to\s+work",
     r"keine\s+(?:visa|visum|sponsoring|relocation)",
     r"(?:g(?:ü|ue)ltige|bestehende)\s+arbeitserlaubnis\s+(?:ist\s+)?(?:erforderlich|voraussetzung|notwendig)",
 ]
@@ -40,6 +41,8 @@ _SPONSOR = [
     r"recogni[sz]ed\s+sponsor",
     r"critical\s+skills\s+employment\s+permit",
     r"skilled\s+worker\s+visa",
+    r"\bLMIA\b",
+    r"global\s+talent\s+stream",
     r"visa\s*:\s*yes",
     r"\|\s*(?:onsite\s*\|\s*)?visa\b",  # HN "Who is hiring" style: "Berlin | ONSITE | VISA"
     r"\bvisa\b(?=[^.\n]{0,15}(?:\||$))",
