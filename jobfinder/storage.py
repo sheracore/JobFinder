@@ -26,6 +26,15 @@ CREATE TABLE IF NOT EXISTS jobs (
     status      TEXT NOT NULL DEFAULT 'new',
     data        TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS tailored_resumes (
+    rowid       INTEGER PRIMARY KEY AUTOINCREMENT,
+    job_id      TEXT NOT NULL,
+    created_at  TEXT NOT NULL,
+    generator   TEXT NOT NULL,
+    changes     TEXT NOT NULL,
+    notice      TEXT NOT NULL,
+    html        TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS cover_letters (
     rowid       INTEGER PRIMARY KEY AUTOINCREMENT,
     job_id      TEXT NOT NULL,
@@ -63,6 +72,7 @@ class Store:
                 self.conn.execute("UPDATE jobs SET id = ? WHERE key = ?", (job_id_for_key(row["key"]), row["key"]))
             self.conn.execute("CREATE INDEX IF NOT EXISTS jobs_id ON jobs (id)")
             self.conn.execute("CREATE INDEX IF NOT EXISTS letters_job ON cover_letters (job_id)")
+            self.conn.execute("CREATE INDEX IF NOT EXISTS resumes_job ON tailored_resumes (job_id)")
 
     def upsert(self, jobs: list[Job]) -> None:
         """Save jobs and set `is_new` on each one. A job's status (saved, applied, ...) is kept across runs."""
@@ -129,6 +139,32 @@ class Store:
                 (job_id,),
             ).fetchall()
         return [dict(row) for row in rows]
+
+    def add_resume(self, job_id: str, page: str, generator: str, changes: list[str], notice: str) -> dict:
+        created = _now()
+        with self._lock, self.conn:
+            cursor = self.conn.execute(
+                "INSERT INTO tailored_resumes (job_id, created_at, generator, changes, notice, html) "
+                "VALUES (?, ?, ?, ?, ?, ?)",
+                (job_id, created, generator, json.dumps(changes, ensure_ascii=False), notice, page),
+            )
+        return {"id": cursor.lastrowid, "created_at": created, "generator": generator, "changes": changes,
+                "notice": notice}
+
+    def resumes(self, job_id: str) -> list[dict]:
+        """Tailored resumes for a job, newest first, without their HTML."""
+        with self._lock:
+            rows = self.conn.execute(
+                "SELECT rowid AS id, created_at, generator, changes, notice FROM tailored_resumes "
+                "WHERE job_id = ? ORDER BY rowid DESC",
+                (job_id,),
+            ).fetchall()
+        return [{**dict(row), "changes": json.loads(row["changes"])} for row in rows]
+
+    def resume_html(self, resume_id: int) -> str | None:
+        with self._lock:
+            row = self.conn.execute("SELECT html FROM tailored_resumes WHERE rowid = ?", (resume_id,)).fetchone()
+        return row["html"] if row else None
 
     def close(self) -> None:
         self.conn.close()

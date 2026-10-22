@@ -173,15 +173,19 @@ sources:
     hours_old: 336
     fetch_descriptions: true
 
-# Cover letters (`jobfinder web` → Generate cover letter).
-cover_letter:
-  resume: resume/resume.html        # the facts letters are allowed to use
+# AI writing in the web app: "Generate cover letter" and "Tailor resume".
+# Gemini has a free tier: create a key at https://aistudio.google.com/apikey and run
+#   export GEMINI_API_KEY="your key"
+# Without a key, both features still work from templates built from your resume.
+ai_writing:
+  resume: resume/resume.html        # the facts the AI is allowed to use
   candidate_name: Mohammad Ghaffary
   # Anything true that is not in the resume and should inform every letter, e.g. notice period or availability.
   extra_context: ""
-  use_claude: true                  # needs ANTHROPIC_API_KEY; without it a template letter is used
-  model: claude-opus-5-5
-  effort: high
+  use_ai: true
+  provider: gemini                  # gemini (free tier, GEMINI_API_KEY) or claude (paid, ANTHROPIC_API_KEY)
+  model: gemini-flash-latest        # always Google's newest Flash model; for Claude use claude-opus-5-5
+  effort: high                      # Claude only
 
 database: data/jobs.db
 sponsors_dir: data/sponsors

@@ -45,12 +45,12 @@ jobfinder -v search                                 # show per-source counts and
 jobfinder sources                                   # list sources
 ```
 
-## Web app: browse jobs and write cover letters
+## Web app: browse jobs, write cover letters and tailor your resume
 
 ```bash
 pip install -e ".[web]"
-export ANTHROPIC_API_KEY=sk-ant-...   # optional, for cover letters written by Claude
-jobfinder web                          # then open http://127.0.0.1:8000
+export GEMINI_API_KEY="your key"   # optional, free at https://aistudio.google.com/apikey
+jobfinder web                       # then open http://127.0.0.1:8000
 ```
 
 - **Job list:** each job shows the company logo, match score, visa signal, country, posting age and salary when
@@ -58,15 +58,20 @@ jobfinder web                          # then open http://127.0.0.1:8000
 - **Job page:** click a job to see the full job description, the exact sentences about visas and relocation, why it
   scored the way it did, and an **Apply on company site** button.
 - **Tracking:** mark jobs as *Saved*, *Applied* or *Hidden*. The status is kept across searches.
-- **Generate cover letter:** writes a letter for that company from your resume (`resume/resume.html`) and the job
-  description. Claude is told to use only facts from your resume (no invented numbers or skills), to link two or
-  three of your real achievements to the job's main requirements, and to mention the visa sponsorship you need in one
-  plain sentence. You can add notes such as "available from January", edit the letter, copy it, download it as
-  `.txt`, and keep several versions.
-  - Without an API key the app still works: it builds a template letter from the resume bullets that best match the
-    job, and it says so.
-  - Settings are in the `cover_letter:` section of `config.yaml`: the model (default `claude-opus-5-5`), the effort
-    level, and `extra_context` for facts that should go into every letter.
+- **Generate cover letter:** Gemini writes a letter for that company from your resume (`resume/resume.html`) and
+  the job description. It is told to use only facts from your resume (no invented numbers or skills), to link two
+  or three of your real achievements to the job's main requirements, and to mention the visa sponsorship you need
+  in one plain sentence. You can add notes such as "available from January", edit the letter, copy it, download it
+  as `.txt`, and keep several versions.
+- **Tailor resume:** Gemini reorders and rewords your resume's summary, skills and bullets for that job. It cannot
+  add anything: JobFinder checks the answer, and any part that adds a number, tool or employer that is not in
+  your resume, or makes it longer, is replaced by your original text (the app tells you which). Open the result and
+  press Ctrl+P → *Save as PDF*. It keeps your resume's layout, so it stays one page.
+- **Without an API key** both features still work: the letter is built from a template, and the resume only gets
+  its bullets and skills reordered. The app says so.
+- **Settings** are in the `ai_writing:` section of `config.yaml`: the provider (`gemini`, or `claude` with
+  `ANTHROPIC_API_KEY` and `pip install -e ".[claude]"`), the model (default `gemini-flash-latest`, Google's newest
+  Flash model), and `extra_context` for facts that should go into every letter.
 - **Find new jobs:** runs a fresh search from the app.
 - **Logos:** they come from the job source when it provides one, otherwise from the company `domain` in
   `config.yaml`, and fall back to coloured initials.

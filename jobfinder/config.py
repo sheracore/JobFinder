@@ -31,14 +31,25 @@ class Search:
 
 
 @dataclass
-class CoverLetterConfig:
+class WritingConfig:
+    """Settings for AI-written cover letters and tailored resumes."""
+
     resume: str = "resume/resume.html"
     candidate_name: str = "Mohammad Ghaffary"
     # Anything true that is not in the resume and should inform letters (availability, notice period, ...).
     extra_context: str = ""
-    use_claude: bool = True
-    model: str = "claude-opus-5-5"
-    effort: str = "high"
+    use_ai: bool = True
+    provider: str = "gemini"  # gemini | claude
+    model: str = "gemini-flash-latest"
+    effort: str = "high"  # Claude only
+
+    @classmethod
+    def from_dict(cls, raw: dict) -> "WritingConfig":
+        raw = dict(raw)
+        if "use_claude" in raw:  # older configs
+            raw.setdefault("use_ai", raw.pop("use_claude"))
+        known = cls.__dataclass_fields__
+        return cls(**{k: v for k, v in raw.items() if k in known})
 
 
 @dataclass
@@ -49,7 +60,7 @@ class Config:
     database: str = "data/jobs.db"
     sponsors_dir: str = "data/sponsors"
     output_dir: str = "reports"
-    cover_letter: CoverLetterConfig = field(default_factory=CoverLetterConfig)
+    writing: WritingConfig = field(default_factory=WritingConfig)
 
     def source_enabled(self, name: str) -> bool:
         return bool(self.sources.get(name, {}).get("enabled", False))
@@ -76,7 +87,8 @@ def load_config(path: str | Path) -> Config:
         database=raw.get("database", "data/jobs.db"),
         sponsors_dir=raw.get("sponsors_dir", "data/sponsors"),
         output_dir=raw.get("output_dir", "reports"),
-        cover_letter=CoverLetterConfig(**(raw.get("cover_letter") or {})),
+        # `cover_letter` is the section's name in older configs.
+        writing=WritingConfig.from_dict(raw.get("ai_writing") or raw.get("cover_letter") or {}),
     )
 
 

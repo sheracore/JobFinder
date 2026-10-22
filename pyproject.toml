@@ -16,11 +16,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# The browser app (`jobfinder web`) and Claude-written cover letters.
-web = ["fastapi>=0.110", "uvicorn>=0.30", "anthropic>=1.0"]
+# The browser app (`jobfinder web`) with Gemini-written cover letters and resumes.
+web = ["fastapi>=0.110", "uvicorn>=0.30", "google-genai>=1.30"]
+# Optional: use Claude instead of Gemini (ai_writing.provider: claude).
+claude = ["anthropic>=1.0"]
 # LinkedIn, Indeed and Glassdoor have no public job APIs; JobSpy reads their public search pages.
 linkedin = ["python-jobspy>=1.1.80"]
-dev = ["pytest>=8", "fastapi>=0.110", "uvicorn>=0.30", "anthropic>=1.0"]
+dev = ["pytest>=8", "fastapi>=0.110", "uvicorn>=0.30", "google-genai>=1.30", "anthropic>=1.0"]
 
 [project.scripts]
 jobfinder = "jobfinder.cli:main"

@@ -188,7 +188,7 @@ function renderSummary() {
 // Detail --------------------------------------------------------------------------------------------------
 
 async function select(id, { push = true } = {}) {
-  if (state.selected !== id) Object.assign(state, { letterId: null, letterError: null, letterNotice: null, notes: "" });
+  if (state.selected !== id) Object.assign(state, { letterId: null, letterError: null, letterNotice: null, notes: "", resumeId: null, resumeError: null });
   state.selected = id;
   if (push) history.replaceState(null, "", `#job=${id}`);
   document.body.classList.add("show-detail");
@@ -215,7 +215,9 @@ function renderDetail() {
     onclick: () => setStatus(job.status === status ? "new" : status),
   }, label);
 
-  const tabs = [["jd", "Job description"], ["why", "Why it matches"], ["letter", `Cover letter${job.letters?.length ? ` (${job.letters.length})` : ""}`]];
+  const count = (list) => (list?.length ? ` (${list.length})` : "");
+  const tabs = [["jd", "Job description"], ["why", "Why it matches"], ["letter", `Cover letter${count(job.letters)}`],
+    ["resume", `Tailored resume${count(job.resumes)}`]];
   $("detail").replaceChildren(
     el("button", { class: "btn small back", type: "button", onclick: closeDetail }, "← All jobs"),
     el("div", { class: "d-head" }, logo(job, true), el("div", {},
@@ -224,6 +226,7 @@ function renderDetail() {
     el("div", { class: "d-actions" },
       /^https?:\/\//i.test(job.url) ? el("a", { class: "btn primary", href: job.url, target: "_blank", rel: "noopener" }, "Apply on company site ↗") : null,
       el("button", { class: "btn", type: "button", onclick: () => { state.tab = "letter"; renderDetail(); generateLetter(); } }, "✍ Generate cover letter"),
+      el("button", { class: "btn", type: "button", onclick: () => { state.tab = "resume"; renderDetail(); tailorResume(); } }, "📄 Tailor resume"),
       statusButton("saved", "★ Save"), statusButton("applied", "✓ Applied"), statusButton("hidden", "Hide")),
     el("div", { class: "tabs", role: "tablist" }, tabs.map(([key, label]) => el("button", {
       class: "tab", role: "tab", type: "button", "aria-selected": state.tab === key ? "true" : "false",
@@ -244,6 +247,7 @@ function renderPanel(job) {
       el("ul", {}, (job.reasons || []).map((r) => el("li", { text: r }))));
   }
   if (state.tab === "letter") return renderLetterPanel(job);
+  if (state.tab === "resume") return renderResumePanel(job);
   return renderDescription(job.description);
 }
 
@@ -275,7 +279,7 @@ function renderLetterPanel(job) {
     panel.append(
       el("div", { class: "cl-row" }, copyBtn,
         el("button", { class: "btn small", type: "button", onclick: () => download(job, text.value) }, "Download .txt"),
-        el("span", { class: "muted", text: `${shown.generator === "template" ? "Template" : "Written by Claude"} · ${new Date(shown.created_at).toLocaleString()}` })),
+        el("span", { class: "muted", text: `${shown.generator === "template" ? "Template" : `Written by ${shown.generator.startsWith("claude") ? "Claude" : "Gemini"}`} · ${new Date(shown.created_at).toLocaleString()}` })),
       text);
     if (job.letters.length > 1) {
       panel.append(el("div", { class: "history" }, el("div", { class: "muted", text: "Earlier versions:" }),
@@ -291,6 +295,54 @@ function download(job, text) {
   const link = el("a", { href: URL.createObjectURL(new Blob([text], { type: "text/plain" })), download: `${name}.txt` });
   link.click();
   URL.revokeObjectURL(link.href);
+}
+
+function renderResumePanel(job) {
+  const latest = job.resumes?.[0];
+  const panel = el("div", {},
+    el("p", { class: "muted", text: "Your resume reordered and reworded for this job. The AI may only use what is already in your resume; any part that adds a number, tool or claim you do not have is replaced by your original text. Check it before sending." }),
+    el("div", { class: "cl-row" },
+      el("button", { class: "btn primary", type: "button", disabled: state.tailoring, onclick: tailorResume },
+        state.tailoring ? [el("span", { class: "spinner" }), " Tailoring…"] : (latest ? "Make a new version" : "Tailor my resume for this job"))));
+  if (state.resumeError) panel.append(el("div", { class: "error", text: state.resumeError }));
+  if (!latest) return panel;
+
+  const shown = job.resumes.find((r) => r.id === state.resumeId) || latest;
+  if (shown.notice) panel.append(el("div", { class: "notice", text: shown.notice }));
+  if (shown.changes?.length) {
+    panel.append(el("div", { class: "muted", text: "What was emphasized:" }), el("ul", {}, shown.changes.map((c) => el("li", { text: c }))));
+  }
+  panel.append(
+    el("div", { class: "cl-row" },
+      el("a", { class: "btn small", href: `/resume/${shown.id}`, target: "_blank", rel: "noopener" }, "Open full page ↗"),
+      el("span", { class: "muted", text: `In the new tab press Ctrl+P → Save as PDF · ${shown.generator === "template" ? "Template" : `Written by ${shown.generator.split(":")[0] === "claude" ? "Claude" : "Gemini"}`} · ${new Date(shown.created_at).toLocaleString()}` })),
+    el("iframe", { class: "resume-frame", src: `/resume/${shown.id}`, title: "Tailored resume preview" }));
+  if (job.resumes.length > 1) {
+    panel.append(el("div", { class: "history" }, el("div", { class: "muted", text: "Earlier versions:" }),
+      job.resumes.map((r, i) => el("div", {}, el("button", { type: "button", onclick: () => { state.resumeId = r.id; renderDetail(); } },
+        `Version ${job.resumes.length - i} · ${new Date(r.created_at).toLocaleString()}${r.id === shown.id ? " (shown)" : ""}`)))));
+  }
+  return panel;
+}
+
+async function tailorResume() {
+  if (state.tailoring || !state.detail) return;
+  const id = state.detail.id;
+  state.tailoring = true;
+  state.resumeError = null;
+  renderDetail();
+  try {
+    const resume = await api(`/api/jobs/${encodeURIComponent(id)}/resume`, { method: "POST" });
+    if (state.detail?.id === id) {
+      state.detail.resumes = [resume, ...(state.detail.resumes || [])];
+      state.resumeId = resume.id;
+    }
+  } catch (err) {
+    state.resumeError = err.message;
+  } finally {
+    state.tailoring = false;
+    if (state.detail?.id === id) renderDetail();
+  }
 }
 
 async function generateLetter() {
@@ -378,7 +430,7 @@ $("refreshBtn").addEventListener("click", startSearch);
 
 loadJobs().then(() => {
   const match = location.hash.match(/job=([\w-]+)/);
-  const tab = location.hash.match(/tab=(jd|why|letter)/);
+  const tab = location.hash.match(/tab=(jd|why|letter|resume)/);
   if (tab) state.tab = tab[1];
   if (match && state.jobs.some((j) => j.id === match[1])) select(match[1], { push: false });
   else if (state.jobs.length && window.matchMedia("(min-width: 821px)").matches) select(filtered()[0]?.id ?? state.jobs[0].id);

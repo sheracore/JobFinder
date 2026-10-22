@@ -4,7 +4,7 @@ pytest.importorskip("fastapi")
 from fastapi.testclient import TestClient  # noqa: E402
 
 from jobfinder import coverletter  # noqa: E402
-from jobfinder.config import CoverLetterConfig  # noqa: E402
+from jobfinder.config import WritingConfig  # noqa: E402
 from jobfinder.models import html_to_text  # noqa: E402
 from jobfinder.pipeline import collect, rank  # noqa: E402
 from jobfinder.sources import REGISTRY  # noqa: E402
@@ -22,7 +22,7 @@ def app_client(config, client, tmp_path, monkeypatch):
         (ROOT / "config.yaml").read_text(encoding="utf-8")
         .replace("database: data/jobs.db", f"database: {db}")
         .replace("resume: resume/resume.html", f"resume: {ROOT / 'resume' / 'resume.html'}")
-        .replace("use_claude: true", "use_claude: false"),
+        .replace("use_ai: true", "use_ai: false"),
         encoding="utf-8",
     )
     jobs = rank(config, collect(config, client, [n for n in REGISTRY if config.source_enabled(n)]))
@@ -58,6 +58,13 @@ def test_status_and_cover_letter(app_client):
     assert "Mohammad Ghaffary" in letter["text"]
     assert len(http.get(f"/api/jobs/{job_id}").json()["letters"]) == 1
 
+    resume = http.post(f"/api/jobs/{job_id}/resume").json()
+    assert resume["generator"] == "template" and "turned off" in resume["notice"]
+    page = http.get(f"/resume/{resume['id']}")
+    assert page.status_code == 200 and "Nobitex" in page.text and jobs[0].company in page.text
+    assert http.get(f"/api/jobs/{job_id}").json()["resumes"][0]["id"] == resume["id"]
+    assert http.get("/resume/999").status_code == 404
+
 
 def test_index_served(app_client):
     http, _ = app_client
@@ -67,7 +74,7 @@ def test_index_served(app_client):
 
 
 def test_template_letter_uses_only_resume_bullets():
-    settings = CoverLetterConfig(resume=str(ROOT / "resume" / "resume.html"))
+    settings = WritingConfig(resume=str(ROOT / "resume" / "resume.html"))
     job = {"company": "Acme", "title": "Senior Python Engineer", "visa_status": "unknown",
            "description": "Python, Django, Kafka and PostgreSQL performance work on a payments platform."}
     letter = coverletter.generate_template(job, settings)
@@ -80,7 +87,7 @@ def test_template_letter_uses_only_resume_bullets():
 
 
 def test_claude_prompt_contains_resume_and_job():
-    settings = CoverLetterConfig(resume=str(ROOT / "resume" / "resume.html"))
+    settings = WritingConfig(resume=str(ROOT / "resume" / "resume.html"))
     resume = coverletter.load_resume(settings.resume)
     assert "Nobitex" in resume and "<li>" not in resume and "font-size" not in resume
     prompt = coverletter.build_user_prompt({"company": "Acme", "title": "Engineer", "description": "Build APIs.",

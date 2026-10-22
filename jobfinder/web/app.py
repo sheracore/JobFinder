@@ -11,11 +11,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from .. import coverletter
+from .. import coverletter, tailor
 from ..config import load_config
 from ..location import COUNTRY_NAMES
 from ..pipeline import run_search
@@ -100,6 +100,7 @@ def create_app(config_path: str = "config.yaml") -> FastAPI:
         if job is None:
             raise HTTPException(404, "job not found")
         job["letters"] = store.letters(job_id)
+        job["resumes"] = store.resumes(job_id)
         return _decorate(job)
 
     @app.post("/api/jobs/{job_id}/status")
@@ -119,11 +120,30 @@ def create_app(config_path: str = "config.yaml") -> FastAPI:
         if job is None:
             raise HTTPException(404, "job not found")
         try:
-            letter = coverletter.generate(job, load_config(config_path).cover_letter, body.notes)
+            letter = coverletter.generate(job, load_config(config_path).writing, body.notes)
         except coverletter.CoverLetterError as exc:
             raise HTTPException(502, str(exc)) from exc
         saved = store.add_letter(job_id, letter.text, letter.generator)
         return {**saved, "notice": letter.notice}
+
+    @app.post("/api/jobs/{job_id}/resume")
+    def tailor_resume(job_id: str):
+        job = store.get_job(job_id)
+        if job is None:
+            raise HTTPException(404, "job not found")
+        try:
+            result = tailor.tailor(job, load_config(config_path).writing)
+        except tailor.TailorError as exc:
+            raise HTTPException(502, str(exc)) from exc
+        return store.add_resume(job_id, result.html, result.generator, result.changes, result.notice)
+
+    @app.get("/resume/{resume_id}", response_class=HTMLResponse)
+    def show_resume(resume_id: int):
+        # The tailored resume as a standalone page; use the browser's Print → Save as PDF.
+        page = store.resume_html(resume_id)
+        if page is None:
+            raise HTTPException(404, "resume not found")
+        return HTMLResponse(page)
 
     @app.get("/api/search")
     def search_status():
