@@ -126,6 +126,8 @@ sources:
   jobspy:
     enabled: false
     sites: [linkedin, indeed]
+    # A list of country codes, or "all" for every European country (32 countries: slow, about
+    # 2-3 minutes per country, and LinkedIn may rate-limit you). Indeed only runs where it has a regional site.
     countries: [DE, NL, IE, SE]
     search_terms: ["python backend visa sponsorship", "senior python developer relocation"]
     results_per_search: 30

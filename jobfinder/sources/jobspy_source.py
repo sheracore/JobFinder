@@ -25,6 +25,20 @@ _INDEED_COUNTRIES = {"DE": "germany", "NL": "netherlands", "IE": "ireland", "GB"
                      "CZ": "czech republic", "LU": "luxembourg"}
 
 
+def countries_option(value) -> list[str]:
+    """`countries` may be a list of ISO codes or "all" for every European country JobFinder knows."""
+    if isinstance(value, str) and value.strip().lower() == "all":
+        return list(COUNTRY_NAMES)
+    return [str(code).upper() for code in (value or ["DE", "NL"])]
+
+
+def sites_for(code: str, sites: list[str]) -> list[str]:
+    """Indeed and Glassdoor only run on their supported regional sites; LinkedIn works everywhere."""
+    if code in _INDEED_COUNTRIES:
+        return sites
+    return [site for site in sites if site not in ("indeed", "glassdoor")]
+
+
 def _clean(value):
     if value is None or (isinstance(value, float) and math.isnan(value)):
         return None
@@ -40,18 +54,20 @@ def jobspy(client: httpx.Client, options: dict, keywords: list[str]):
         return
 
     sites = options.get("sites") or ["linkedin", "indeed"]
-    countries = options.get("countries") or ["DE", "NL"]
     terms = options.get("search_terms") or [f"{k} visa sponsorship" for k in keywords]
-    for code in countries:
+    for code in countries_option(options.get("countries")):
+        country_sites = sites_for(code, sites)
+        if not country_sites:
+            continue
         for term in terms:
             try:
                 frame = scrape_jobs(
-                    site_name=sites,
+                    site_name=country_sites,
                     search_term=term,
                     location=COUNTRY_NAMES.get(code, code),
                     results_wanted=int(options.get("results_per_search", 30)),
                     hours_old=int(options.get("hours_old", 24 * 14)),
-                    country_indeed=_INDEED_COUNTRIES.get(code, "germany"),
+                    country_indeed=_INDEED_COUNTRIES.get(code, "usa"),  # unused when Indeed is not in country_sites
                     linkedin_fetch_description=bool(options.get("fetch_descriptions", True)),
                 )
             except Exception as exc:  # JobSpy raises many different scraping errors.
